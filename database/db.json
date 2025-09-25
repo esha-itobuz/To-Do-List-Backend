@@ -1,0 +1,18 @@
+[
+    {
+        "id": 1,
+        "title": "Esha Tokedar",
+        "createdAt": "2024-09-25T18:30:00",
+        "isImportant": true,
+        "tags": ["student", "letterboxd"],
+        "updatedAt": "2024-09-25T13:00:00Z"
+    },
+    {
+        "id": 2,
+        "title": "Kurt Cobain",
+        "createdAt": "2024-09-25T18:30:00",
+        "isImportant": true,
+        "tags": ["singer", "nirvana"],
+        "updatedAt": "2024-09-25T13:00:00Z"
+    }
+]
