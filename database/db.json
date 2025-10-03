@@ -2,14 +2,15 @@
   "todos": [
     {
       "id": 1,
-      "title": "Do the dishes",
+      "title": "Finish CRUD API",
       "createdAt": "2024-09-25T18:30:00",
       "isImportant": true,
       "tags": [
-        "food",
-        "soap"
+        "nodejs",
+        "api"
       ],
-      "updatedAt": "2024-09-25T13:00:00Z"
+      "updatedAt": "2024-09-25T13:00:00Z",
+      "isCompleted": false
     },
     {
       "id": 2,
@@ -24,12 +25,12 @@
     },
     {
       "id": 3,
-      "title": "Finish project",
-      "createdAt": "2025-09-26T05:13:02.270Z",
+      "title": "Learn Express routing",
+      "createdAt": "2025-10-03T16:29:12.648Z",
       "isCompleted": false,
       "tags": [
-        "work",
-        "urgent"
+        "express",
+        "backend"
       ]
     }
   ]
