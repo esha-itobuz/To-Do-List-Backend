@@ -2,7 +2,15 @@ const express = require('express')
 const fs = require('fs')
 const path = require('path')
 
+const cors = require('cors');
+
 const app = express()
+
+app.use(cors({
+  origin: "*",      
+  methods: ["GET","POST","PUT","PATCH","DELETE"],
+  allowedHeaders: ["Content-Type"]
+}));
 app.use(express.json())
 
 const dbPath = path.join(__dirname, '..', 'database', 'db.json')
