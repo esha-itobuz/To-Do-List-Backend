@@ -1,6 +1,7 @@
 import path from 'path'
 import { readFile, writeFile } from 'fs/promises'
 import { fileURLToPath } from 'url'
+import crypto from 'crypto'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -39,7 +40,7 @@ const getAllTodos = async () => {
 
 const getTodoById = async (id) => {
   const db = await readDB()
-  return db.todos.find((t) => t.id === parseInt(id))
+  return db.todos.find((t) => t.id === id)
 }
 
 const createTodo = async (todoData) => {
@@ -49,10 +50,12 @@ const createTodo = async (todoData) => {
 
   const db = await readDB()
   const newTodo = {
-    id: db.todos.length > 0 ? db.todos[db.todos.length - 1].id + 1 : 1,
+    id: crypto.randomUUID(),
     title: todoData.title,
     createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
     isCompleted: false,
+    isImportant: false,
     tags: todoData.tags || [],
   }
   db.todos.push(newTodo)
@@ -62,7 +65,7 @@ const createTodo = async (todoData) => {
 
 const updateTodo = async (id, updates) => {
   const db = await readDB()
-  const todoIndex = db.todos.findIndex((t) => t.id === parseInt(id))
+  const todoIndex = db.todos.findIndex((t) => t.id === id)
   if (todoIndex === -1) {
     return null
   }
@@ -79,6 +82,8 @@ const updateTodo = async (id, updates) => {
     todo.tags = updates.tags
   }
 
+  todo.updatedAt = new Date().toISOString()
+
   db.todos[todoIndex] = todo
   await writeDB(db)
   return todo
@@ -86,7 +91,7 @@ const updateTodo = async (id, updates) => {
 
 const deleteTodo = async (id) => {
   const db = await readDB()
-  const todoIndex = db.todos.findIndex((t) => t.id === parseInt(id))
+  const todoIndex = db.todos.findIndex((t) => t.id === id)
   if (todoIndex === -1) {
     return null
   }

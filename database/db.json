@@ -1,38 +1,37 @@
 {
   "todos": [
     {
-      "id": 1,
-      "title": "Finish CRUD APIs",
-      "createdAt": "2024-09-25T18:30:00",
-      "isImportant": true,
-      "tags": [
-        "nodejs",
-        "api",
-        "backend"
-      ],
-      "updatedAt": "2024-09-25T13:00:00Z",
-      "isCompleted": false
-    },
-    {
-      "id": 2,
-      "title": "Clean da kitchen top",
-      "createdAt": "2024-09-25T18:30:00",
-      "isImportant": true,
-      "tags": [
-        "food",
-        "soap"
-      ],
-      "updatedAt": "2024-09-25T13:00:00Z",
-      "isCompleted": false
-    },
-    {
-      "id": 3,
-      "title": "oooo",
-      "createdAt": "2025-10-07T06:43:15.981Z",
+      "id": "cc9ef11a-6f91-4122-906e-0b36f372d555",
+      "title": "Clean da Kitchen Top",
+      "createdAt": "2025-10-07T10:19:50.774Z",
+      "updatedAt": "2025-10-07T12:35:13.815Z",
       "isCompleted": false,
+      "isImportant": false,
       "tags": [
-        "aaa"
+        "Cooking",
+        "Soap"
       ]
+    },
+    {
+      "id": "080b93a8-6456-4ffb-80dd-5c77c5c8e0b5",
+      "title": "Finish CRUD APIs",
+      "createdAt": "2025-10-07T10:20:31.489Z",
+      "updatedAt": "2025-10-07T12:31:54.759Z",
+      "isCompleted": false,
+      "isImportant": false,
+      "tags": [
+        "Backend",
+        "Nodejs"
+      ]
+    },
+    {
+      "id": "633b4632-bdf6-487a-8ea0-f44e1bbe260e",
+      "title": "aaa",
+      "createdAt": "2025-10-07T12:48:06.062Z",
+      "updatedAt": "2025-10-07T12:48:06.062Z",
+      "isCompleted": false,
+      "isImportant": false,
+      "tags": []
     }
   ]
 }
