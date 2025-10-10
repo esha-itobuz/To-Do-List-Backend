@@ -1,8 +1,13 @@
 import * as yup from 'yup'
 
-const todoSchema = yup.object({
+export const taskCreateSchema = yup.object({
   title: yup.string().required('Title is required'),
-  completed: yup.boolean().default(false),
+  tags: yup.array().of(yup.string()).default([]),
+  isCompleted: yup.boolean().default(false),
 })
 
-export default todoSchema
+export const taskUpdateSchema = yup.object({
+  title: yup.string(),
+  tags: yup.array().of(yup.string()),
+  isCompleted: yup.boolean(),
+})

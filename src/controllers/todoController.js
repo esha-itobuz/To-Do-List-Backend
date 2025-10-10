@@ -1,4 +1,4 @@
-import Todo from '../models/schema.js'
+import Todo from '../models/todoModel.js'
 import mongoose from 'mongoose'
 
 function normalize(todo) {

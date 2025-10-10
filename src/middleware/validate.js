@@ -1,12 +1,38 @@
-import todoSchema from '../schemas/todoSchema.js'
+import { taskCreateSchema, taskUpdateSchema } from '../schemas/todoSchema.js'
 
-const validate = async (req, res, next) => {
-  try {
-    await todoSchema.validate(req.body, { abortEarly: false })
-    next()
-  } catch (error) {
-    return res.status(400).json({ errors: error.errors })
+export default class toDoValidations {
+  //validation for adding new task in the todo list.
+  validateRequest = async (req, res, next) => {
+    try {
+      await taskCreateSchema.validate(req.body, {
+        abortEarly: false,
+        stripUnknown: true,
+      })
+      next()
+    } catch (err) {
+      if (err.name === 'ValidationError') {
+        err.status = 400
+        next(new Error(err.errors.join(', ')))
+      }
+      next(err)
+    }
+  }
+
+  //validation for updating values.
+  updateRequest = async (req, res, next) => {
+    try {
+      await taskUpdateSchema.validate(req.body, {
+        abortEarly: false,
+        stripUnknown: true,
+      })
+
+      next()
+    } catch (err) {
+      if (err.name === 'ValidationError') {
+        err.status = 400
+        next(new Error(err.errors.join(', ')))
+      }
+      next(err)
+    }
   }
 }
-
-export default validate
