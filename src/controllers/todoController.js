@@ -109,6 +109,55 @@ const deleteTodo = async (req, res) => {
   }
 }
 
+const sortTask = async (req, res, next) => {
+  try {
+    console.log('inside backend sorting')
+    const sortFilter = req.query.sortFilter
+    console.log(sortFilter)
+
+    let filteredTasks = null
+
+    if (sortFilter === 'pending') {
+      filteredTasks = await Todo.find({ isCompleted: false })
+    } else if (sortFilter === 'completed') {
+      filteredTasks = await Todo.find({ isCompleted: true })
+    }
+
+    if (!filteredTasks) {
+      throw new Error('cannot fetch sorted tasks')
+    }
+    console.log('this is filtered tasks', filteredTasks)
+    return await res.json(filteredTasks)
+  } catch (e) {
+    next(e)
+  }
+}
+
+const searchTask = async (req, res, next) => {
+  try {
+    let { searchText, searchFilter } = req.query
+    searchText = searchText.toLowerCase()
+
+    console.log(searchFilter, searchText)
+
+    const filteredTasks = await Todo.find({
+      $or: [
+        { task: { $regex: searchText, $options: 'i' } },
+        { preference: { $regex: searchText, $options: 'i' } },
+        { tags: { $elemMatch: { $regex: searchText, $options: 'i' } } },
+      ],
+    })
+    
+    if (!filteredTasks) {
+      throw new Error('cannot fetch searched tasks')
+    }
+    console.log('this is filtered tasks', filteredTasks)
+    return await res.json(filteredTasks)
+  } catch (e) {
+    next(e)
+  }
+}
+
 export {
   getAllTodos,
   getTodoById,
@@ -116,4 +165,6 @@ export {
   updateTodo,
   patchTodo,
   deleteTodo,
+  sortTask,
+  searchTask,
 }
