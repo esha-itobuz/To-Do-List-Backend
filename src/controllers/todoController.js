@@ -25,7 +25,8 @@ const getTodoById = async (req, res) => {
     if (!todo) {
       return res.status(404).json({ error: 'Todo not found' })
     }
-    res.json(todo.map(normalize))
+    // normalize single document
+    res.json(normalize(todo))
   } catch (error) {
     console.error('Error getting todo:', error)
     res.status(500).json({ error: 'Internal server error' })
@@ -112,22 +113,29 @@ const deleteTodo = async (req, res) => {
 const sortTask = async (req, res, next) => {
   try {
     console.log('inside backend sorting')
-    const sortFilter = req.query.sortFilter
-    console.log(sortFilter)
+    const sort = req.query.sort || req.query.sortFilter || 'default'
+    console.log('sort:', sort)
 
-    let filteredTasks = null
-
-    if (sortFilter === 'pending') {
-      filteredTasks = await Todo.find({ isCompleted: false })
-    } else if (sortFilter === 'completed') {
-      filteredTasks = await Todo.find({ isCompleted: true })
+    let sortOption = {}
+    if (sort === 'alphabetical') {
+      sortOption = { title: 1 }
+    } else if (sort === 'completed') {
+      sortOption = { isCompleted: -1, createdAt: -1 }
+    } else if (sort === 'uncompleted') {
+      sortOption = { isCompleted: 1, createdAt: -1 }
+    } else if (sort === 'newest') {
+      sortOption = { createdAt: -1 }
+    } else if (sort === 'oldest') {
+      sortOption = { createdAt: 1 }
+    } else {
+      sortOption = {}
     }
 
-    if (!filteredTasks) {
-      throw new Error('cannot fetch sorted tasks')
-    }
-    console.log('this is filtered tasks', filteredTasks)
-    return await res.json(filteredTasks)
+    const query = Todo.find()
+    if (Object.keys(sortOption).length) query.sort(sortOption)
+
+    const tasks = await query.exec()
+    return res.json(tasks.map(normalize))
   } catch (e) {
     next(e)
   }
@@ -136,23 +144,26 @@ const sortTask = async (req, res, next) => {
 const searchTask = async (req, res, next) => {
   try {
     let { searchText, searchFilter } = req.query
-    searchText = searchText.toLowerCase()
+    searchText = (searchText || '').trim()
 
-    console.log(searchFilter, searchText)
+    console.log('searchFilter:', searchFilter, 'searchText:', searchText)
 
-    const filteredTasks = await Todo.find({
-      $or: [
-        { task: { $regex: searchText, $options: 'i' } },
-        { preference: { $regex: searchText, $options: 'i' } },
-        { tags: { $elemMatch: { $regex: searchText, $options: 'i' } } },
-      ],
-    })
-    
-    if (!filteredTasks) {
-      throw new Error('cannot fetch searched tasks')
+    if (!searchText) {
+      const all = await Todo.find()
+      return res.json(all.map(normalize))
     }
-    console.log('this is filtered tasks', filteredTasks)
-    return await res.json(filteredTasks)
+
+    const regex = { $regex: searchText, $options: 'i' }
+    const orClauses = [{ title: regex }, { tags: { $elemMatch: regex } }]
+
+    const query = { $or: orClauses }
+
+    if (searchFilter === 'completed') query.isCompleted = true
+    if (searchFilter === 'uncompleted') query.isCompleted = false
+
+    const filteredTasks = await Todo.find(query)
+
+    return res.json(filteredTasks.map(normalize))
   } catch (e) {
     next(e)
   }
