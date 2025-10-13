@@ -13,6 +13,14 @@ authRoutes.post('/register', authentication.registerUser)
 authRoutes.post('/login', authentication.loginUser)
 authRoutes.post('/logout', authentication.logoutUser)
 authRoutes.post('/send-otp', authentication.handleSendOtp)
-authRoutes.post('/verify-otp', authentication.handleVerifyOtpAndResetPassword)
+authRoutes.post(
+  '/reset-password',
+  authentication.handleVerifyOtpAndResetPassword
+)
+authRoutes.post('/verify-email', authentication.handleVerifyEmail)
+authRoutes.post(
+  '/resend-verification',
+  authentication.handleResendVerificationOtp
+)
 
 export default authRoutes

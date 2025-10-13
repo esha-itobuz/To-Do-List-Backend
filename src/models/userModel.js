@@ -14,12 +14,25 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    resetOtp: {
-      type: String,
-    },
-    otpExpiry: {
-      type: Date,
-    },
+    // legacy scalar OTP fields removed; using history arrays below
+    // store history of hashed reset OTPs (kept even after expiry)
+    resetOtps: [
+      {
+        otpHash: { type: String, required: true },
+        expiry: { type: Date, required: true },
+        used: { type: Boolean, default: false },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
+    // store history of hashed email verification OTPs
+    emailVerificationOtps: [
+      {
+        otpHash: { type: String, required: true },
+        expiry: { type: Date, required: true },
+        used: { type: Boolean, default: false },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   {
     timestamps: true,
