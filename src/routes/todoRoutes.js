@@ -1,6 +1,6 @@
 import express from 'express'
 import * as todoController from '../controllers/todoController.js'
-import toDoValidations from '../middleware/validate.js'
+import toDoValidations from '../middleware/validationMiddleware.js'
 
 const validationInstance = new toDoValidations()
 

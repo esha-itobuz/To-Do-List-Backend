@@ -1,15 +1,17 @@
 import express from 'express'
 import cors from 'cors'
-import dotenv from 'dotenv'
+import 'dotenv/config'
 import mongoose from 'mongoose'
 import todoRoutes from './routes/todoRoutes.js'
-
-dotenv.config()
+import authRoutes from './routes/userRoutes.js'
+import protectedRoute from './routes/protectedRoutes.js'
+import loggerMiddleware from './middleware/loggerMiddleware.js'
 
 const PORT = process.env.PORT
 const MONGO_URI = process.env.MONGO_URI
 
 const app = express()
+app.use(express.json())
 
 app.use(
   cors({
@@ -18,7 +20,6 @@ app.use(
     allowedHeaders: ['Content-Type'],
   })
 )
-app.use(express.json())
 
 app.use((req, res, next) => {
   res.set('Cache-Control', 'no-store')
@@ -28,7 +29,10 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => {
   res.json({ success: true, message: 'Server is up and running' })
 })
+app.use(loggerMiddleware)
 app.use('/todos', todoRoutes)
+app.use('/auth', authRoutes)
+app.use('/protected', protectedRoute)
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' })
