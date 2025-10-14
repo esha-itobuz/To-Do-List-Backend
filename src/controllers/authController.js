@@ -74,8 +74,6 @@ export default class AuthenticationController {
 
   loginUser = async (req, res, next) => {
     try {
-      const secretKey = process.env.JWT_SECRET_KEY
-      const refreshSecretKey = process.env.JWT_REFRESH_SECRET_KEY
       const { email, password } = req.body
       const user = await User.findOne({ email })
 
@@ -98,20 +96,72 @@ export default class AuthenticationController {
         throw new Error('Authentication failed, password not matched')
       }
 
-      const accessToken = jwt.sign({ userId: user._id }, secretKey, {
-        expiresIn: '1h',
-      })
-
-      const refreshToken = jwt.sign({ userId: user._id }, refreshSecretKey, {
-        expiresIn: '69d',
-      })
-
-      await user.save()
-
-      res.status(200).json({ accessToken, refreshToken, user })
+      const accessToken = this._generateAccessToken({ userId: user._id })
+      const refreshToken = this._generateRefreshToken({ userId: user._id })
+      return res.status(200).json({ accessToken, refreshToken, user })
     } catch (error) {
       next(error)
     }
+  }
+
+  // POST /refresh - accepts { refreshToken } and returns a new accessToken
+  refreshAccessToken = async (req, res) => {
+    const { refreshToken } = req.body
+    const refreshSecretKey = process.env.JWT_REFRESH_SECRET_KEY
+
+    if (!refreshToken)
+      return res.status(401).json({ message: 'No refresh token provided' })
+
+    try {
+      const payload = jwt.verify(refreshToken, refreshSecretKey)
+
+      // optionally verify the user still exists
+      const user = await User.findById(payload.userId)
+      if (!user) return res.status(404).json({ message: 'User not found' })
+
+      // issue a new access token (no DB-stored refresh token checks because refresh tokens
+      // are stored client-side/localStorage only)
+      const newAccessToken = this._generateAccessToken({
+        userId: payload.userId,
+      })
+      return res.status(200).json({ accessToken: newAccessToken })
+    } catch (err) {
+      console.error('Error refreshing token:', err)
+      return res
+        .status(403)
+        .json({ message: 'Invalid or expired refresh token' })
+    }
+  }
+
+  // optional POST /access - alias for /refresh
+  accessFromRefresh = async (req, res) => {
+    return this.refreshAccessToken(req, res)
+  }
+
+  // helper: generate access token
+  _generateAccessToken(payload) {
+    const secretKey = process.env.JWT_SECRET_KEY
+    const ttl = process.env.ACCESS_TOKEN_TTL || '5s'
+    return jwt.sign(payload, secretKey, { expiresIn: ttl })
+  }
+
+  // helper: generate refresh token
+  _generateRefreshToken(payload) {
+    const refreshSecretKey = process.env.JWT_REFRESH_SECRET_KEY
+    const ttl = process.env.REFRESH_TOKEN_TTL || '69d'
+    return jwt.sign(payload, refreshSecretKey, { expiresIn: ttl })
+  }
+
+  _getRefreshExpiryDate() {
+    // parse REFRESH_TOKEN_TTL if possible (supports days like '69d') else fallback to 69 days
+    const ttl = process.env.REFRESH_TOKEN_TTL || '69d'
+    const match = ttl.match(/(\d+)d/)
+    if (match) {
+      const days = parseInt(match[1], 10)
+      return new Date(Date.now() + days * 24 * 60 * 60 * 1000)
+    }
+    // fallback: 69 days
+    return new Date(Date.now() + 69 * 24 * 60 * 60 * 1000)
   }
 
   logoutUser = async (req, res, next) => {
