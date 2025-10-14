@@ -42,11 +42,9 @@ export default class AuthenticationController {
       const user = new User({ email, password: hashedPass, isVerified: false })
 
       const otp = crypto.randomInt(100000, 999999).toString()
-      // hash the otp before storing
       const otpHash = await bcrypt.hash(otp, 10)
       const expiry = Date.now() + 5 * 60 * 1000
 
-      // keep single fields for backward compatibility but also push to history
       user.emailVerificationOtp = undefined
       user.emailVerificationExpiry = undefined
       user.emailVerificationOtps.push({ otpHash, expiry })
@@ -86,12 +84,12 @@ export default class AuthenticationController {
         throw new Error('User not found!')
       }
 
-      if (!user.isVerified) {
-        return res.status(403).json({
-          message:
-            'Email not verified. Please verify your email before logging in.',
-        })
-      }
+      // if (!user.isVerified) {
+      //   return res.status(403).json({
+      //     message:
+      //       'Email not verified. Please verify your email before logging in.',
+      //   })
+      // }
 
       const passwordMatched = await bcrypt.compare(password, user.password)
 
@@ -151,7 +149,6 @@ export default class AuthenticationController {
       const otpHash = await bcrypt.hash(otp, 10)
       const expiry = Date.now() + 5 * 60 * 1000
 
-      // keep legacy fields for compatibility but push to history
       user.resetOtp = undefined
       user.otpExpiry = undefined
       user.resetOtps.push({ otpHash, expiry })
@@ -175,7 +172,6 @@ export default class AuthenticationController {
       const user = await User.findOne({ email })
       if (!user)
         return res.status(400).json({ message: 'Invalid email or OTP' })
-      // check history of verification otps for a match
       const now = Date.now()
       const matchingIndex = user.emailVerificationOtps.findIndex((entry) => {
         if (entry.used) return false
@@ -187,7 +183,6 @@ export default class AuthenticationController {
         return res.status(400).json({ message: 'Invalid or expired OTP' })
       }
 
-      // mark as used and verify user
       user.emailVerificationOtps[matchingIndex].used = true
       user.isVerified = true
       await user.save()
@@ -199,7 +194,6 @@ export default class AuthenticationController {
     }
   }
 
-  // allows verifying days after signup
   handleResendVerificationOtp = async (req, res) => {
     const { email } = req.body
     try {
@@ -248,10 +242,9 @@ export default class AuthenticationController {
       const user = await User.findOne({ email })
 
       if (!user) {
-        res.json({ message: 'OTP sent', email })
+        return res.json({ message: 'OTP sent', email })
       }
 
-      // find matching, unused, unexpired reset otp in history
       const now = Date.now()
       const matchingIndex = user.resetOtps.findIndex((entry) => {
         if (entry.used) return false
@@ -266,6 +259,10 @@ export default class AuthenticationController {
         })
       }
 
+      if (!newPassword && !confirmNewPassword) {
+        return res.json({ email })
+      }
+
       if (newPassword !== confirmNewPassword) {
         return res.json({
           email: email,
@@ -275,7 +272,6 @@ export default class AuthenticationController {
 
       const hashedNewPass = await bcrypt.hash(newPassword, 10)
       user.password = hashedNewPass
-      // mark the matching otp as used
       user.resetOtps[matchingIndex].used = true
 
       await user.save()
