@@ -25,7 +25,6 @@ const getTodoById = async (req, res) => {
     if (!todo) {
       return res.status(404).json({ error: 'Todo not found' })
     }
-    // normalize single document
     res.json(normalize(todo))
   } catch (error) {
     console.error('Error getting todo:', error)

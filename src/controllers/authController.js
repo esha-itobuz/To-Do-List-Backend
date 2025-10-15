@@ -136,23 +136,13 @@ export default class AuthenticationController {
   _generateAccessToken(payload) {
     const secretKey = process.env.JWT_SECRET_KEY
     const ttl = process.env.ACCESS_TOKEN_TTL
-    return jwt.sign(payload, secretKey, { expiresIn: ttl })
+    return jwt.sign(payload, secretKey, { expiresIn: '1m' })
   }
 
   _generateRefreshToken(payload) {
     const refreshSecretKey = process.env.JWT_REFRESH_SECRET_KEY
     const ttl = process.env.REFRESH_TOKEN_TTL
     return jwt.sign(payload, refreshSecretKey, { expiresIn: ttl })
-  }
-
-  _getRefreshExpiryDate() {
-    const ttl = process.env.REFRESH_TOKEN_TTL || '69d'
-    const match = ttl.match(/(\d+)d/)
-    if (match) {
-      const days = parseInt(match[1], 10)
-      return new Date(Date.now() + days * 24 * 60 * 60 * 1000)
-    }
-    return new Date(Date.now() + 69 * 24 * 60 * 60 * 1000)
   }
 
   logoutUser = async (req, res, next) => {
