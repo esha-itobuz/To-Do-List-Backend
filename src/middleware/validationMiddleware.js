@@ -1,7 +1,6 @@
 import { taskCreateSchema, taskUpdateSchema } from '../schemas/todoSchema.js'
 
 export default class toDoValidations {
-  //validation for adding new task in the todo list.
   validateRequest = async (req, res, next) => {
     try {
       await taskCreateSchema.validate(req.body, {
@@ -18,7 +17,6 @@ export default class toDoValidations {
     }
   }
 
-  //validation for updating values.
   updateRequest = async (req, res, next) => {
     try {
       await taskUpdateSchema.validate(req.body, {

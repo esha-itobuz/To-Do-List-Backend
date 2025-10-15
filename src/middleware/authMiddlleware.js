@@ -15,8 +15,8 @@ export default function verifyToken(req, res, next) {
   }
 
   try {
-    const decoded = jwt.verify(token, secretKey)
-    req.userId = decoded.userId
+      const decoded = jwt.verify(token, secretKey)
+      req.user = { id: decoded.userId }
     next()
   } catch {
     return res

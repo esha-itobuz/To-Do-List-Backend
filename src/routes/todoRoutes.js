@@ -7,7 +7,7 @@ const validationInstance = new toDoValidations()
 
 const router = express.Router()
 
-router.get('/', todoController.getAllTodos)
+router.get('/', verifyToken, todoController.getAllTodos)
 router.post(
   '/',
   verifyToken,

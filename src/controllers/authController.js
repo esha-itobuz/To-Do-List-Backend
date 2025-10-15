@@ -85,12 +85,12 @@ export default class AuthenticationController {
         throw new Error('User not found!')
       }
 
-      // if (!user.isVerified) {
-      //   return res.status(403).json({
-      //     message:
-      //       'Email not verified. Please verify your email before logging in.',
-      //   })
-      // }
+      if (!user.isVerified) {
+        return res.status(403).json({
+          message:
+            'Email not verified. Please verify your email before logging in.',
+        })
+      }
 
       const passwordMatched = await bcrypt.compare(password, user.password)
 
