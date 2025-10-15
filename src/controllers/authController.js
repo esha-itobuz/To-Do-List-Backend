@@ -3,6 +3,9 @@ import bcrypt from 'bcrypt'
 import nodemailer from 'nodemailer'
 import crypto from 'crypto'
 import User from '../models/userModel.js'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -104,9 +107,9 @@ export default class AuthenticationController {
     }
   }
 
-  // POST /refresh - accepts { refreshToken } and returns a new accessToken
   refreshAccessToken = async (req, res) => {
-    const { refreshToken } = req.body
+    const authHeader = req.headers['authorization']
+    const refreshToken = authHeader && authHeader.split(' ')[1]
     const refreshSecretKey = process.env.JWT_REFRESH_SECRET_KEY
 
     if (!refreshToken)
@@ -115,12 +118,9 @@ export default class AuthenticationController {
     try {
       const payload = jwt.verify(refreshToken, refreshSecretKey)
 
-      // optionally verify the user still exists
       const user = await User.findById(payload.userId)
       if (!user) return res.status(404).json({ message: 'User not found' })
 
-      // issue a new access token (no DB-stored refresh token checks because refresh tokens
-      // are stored client-side/localStorage only)
       const newAccessToken = this._generateAccessToken({
         userId: payload.userId,
       })
@@ -133,34 +133,25 @@ export default class AuthenticationController {
     }
   }
 
-  // optional POST /access - alias for /refresh
-  accessFromRefresh = async (req, res) => {
-    return this.refreshAccessToken(req, res)
-  }
-
-  // helper: generate access token
   _generateAccessToken(payload) {
     const secretKey = process.env.JWT_SECRET_KEY
-    const ttl = process.env.ACCESS_TOKEN_TTL || '5s'
+    const ttl = process.env.ACCESS_TOKEN_TTL
     return jwt.sign(payload, secretKey, { expiresIn: ttl })
   }
 
-  // helper: generate refresh token
   _generateRefreshToken(payload) {
     const refreshSecretKey = process.env.JWT_REFRESH_SECRET_KEY
-    const ttl = process.env.REFRESH_TOKEN_TTL || '69d'
+    const ttl = process.env.REFRESH_TOKEN_TTL
     return jwt.sign(payload, refreshSecretKey, { expiresIn: ttl })
   }
 
   _getRefreshExpiryDate() {
-    // parse REFRESH_TOKEN_TTL if possible (supports days like '69d') else fallback to 69 days
     const ttl = process.env.REFRESH_TOKEN_TTL || '69d'
     const match = ttl.match(/(\d+)d/)
     if (match) {
       const days = parseInt(match[1], 10)
       return new Date(Date.now() + days * 24 * 60 * 60 * 1000)
     }
-    // fallback: 69 days
     return new Date(Date.now() + 69 * 24 * 60 * 60 * 1000)
   }
 

@@ -13,7 +13,6 @@ authRoutes.post('/register', authentication.registerUser)
 authRoutes.post('/login', authentication.loginUser)
 authRoutes.post('/logout', authentication.logoutUser)
 authRoutes.post('/refresh', authentication.refreshAccessToken)
-authRoutes.post('/access', authentication.accessFromRefresh) // alias for /refresh
 authRoutes.post('/send-otp', authentication.handleSendOtp)
 authRoutes.post(
   '/reset-password',
@@ -23,6 +22,6 @@ authRoutes.post('/verify-email', authentication.handleVerifyEmail) //for isVerif
 authRoutes.post(
   '/resend-verification',
   authentication.handleResendVerificationOtp
-) // for isVerified field in future
+) 
 
 export default authRoutes
