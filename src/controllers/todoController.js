@@ -125,7 +125,9 @@ const sortTask = async (req, res, next) => {
     else if (sort === 'oldest') sortOption = { createdAt: 1 }
 
     const query = Todo.find({ userId })
-    if (Object.keys(sortOption).length) query.sort(sortOption)
+    if (Object.keys(sortOption).length) {
+      query.sort(sortOption)
+      }
 
     const tasks = await query.exec()
     return res.json(tasks.map(normalize))

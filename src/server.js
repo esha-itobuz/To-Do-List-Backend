@@ -5,6 +5,7 @@ import mongoose from 'mongoose'
 import todoRoutes from './routes/todoRoutes.js'
 import authRoutes from './routes/userRoutes.js'
 import protectedRoute from './routes/protectedRoutes.js'
+import otpRoutes from './routes/otpRoutes.js'
 import loggerMiddleware from './middleware/loggerMiddleware.js'
 
 const PORT = process.env.PORT
@@ -32,6 +33,7 @@ app.get('/', (req, res) => {
 app.use(loggerMiddleware)
 app.use('/todos', todoRoutes)
 app.use('/auth', authRoutes)
+app.use('/otp', otpRoutes)
 app.use('/protected', protectedRoute)
 
 app.use((req, res) => {

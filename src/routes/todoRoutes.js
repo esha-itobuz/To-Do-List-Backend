@@ -22,7 +22,7 @@ router.put(
 )
 router.patch('/:id', verifyToken, todoController.patchTodo)
 router.delete('/:id', verifyToken, todoController.deleteTodo)
-router.get('/search', todoController.searchTask)
-router.get('/sort', todoController.sortTask)
+router.get('/search', verifyToken, todoController.searchTask)
+router.get('/sort', verifyToken, todoController.sortTask)
 
 export default router
