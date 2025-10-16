@@ -48,8 +48,6 @@ export default class AuthenticationController {
       const otpHash = await bcrypt.hash(otp, 10)
       const expiry = Date.now() + 5 * 60 * 1000
 
-      user.emailVerificationOtp = undefined
-      user.emailVerificationExpiry = undefined
       user.emailVerificationOtps.push({ otpHash, expiry })
 
       await user.save()
@@ -180,8 +178,6 @@ export default class AuthenticationController {
       const otpHash = await bcrypt.hash(otp, 10)
       const expiry = Date.now() + 5 * 60 * 1000
 
-      user.resetOtp = undefined
-      user.otpExpiry = undefined
       user.resetOtps.push({ otpHash, expiry })
       await user.save()
 

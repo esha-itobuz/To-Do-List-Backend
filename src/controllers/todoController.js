@@ -10,7 +10,7 @@ function normalize(todo) {
 
 const getAllTodos = async (req, res) => {
   try {
-    const userId = req.user.id // Assuming userId is available from the JWT payload
+    const userId = req.user.id
     const todos = await Todo.find({ userId })
     res.json(todos.map(normalize))
   } catch (error) {
@@ -116,7 +116,6 @@ const sortTask = async (req, res, next) => {
     const sort = req.query.sort || req.query.sortFilter || 'default'
     let sortOption = {}
 
-    // Sorting logic remains the same
     if (sort === 'alphabetical') sortOption = { title: 1 }
     else if (sort === 'completed')
       sortOption = { isCompleted: -1, createdAt: -1 }
